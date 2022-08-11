@@ -19,6 +19,31 @@ router.get('/', async (req: Request, res: Response) => {
 //@TODO
 //Add an endpoint to GET a specific resource by Primary Key
 
+// read in id
+// check if id is valid
+// return object
+router.get('/:id', async (req:Request, res:Response) => {
+    let { id } = req.params;
+
+    if ( !id ) {
+        return res.status(400).send(`id is required`)
+    };
+
+    const items = await FeedItem.findAll({
+        where: {
+            id: id
+        }
+    });
+
+    items.map((item) => {
+            if(item.url) {
+                item.url = AWS.getGetSignedUrl(item.url);
+            }
+    });
+    res.send(items);
+});
+
+
 // update a specific resource
 router.patch('/:id', 
     requireAuth, 
